@@ -8,9 +8,19 @@ module Rich
 
     def index
       @type = params[:type]
-
-      @items = @type == "image" ? RichFile.images : RichFile.files
-
+      # @items = @type == "image" ? RichFile.images : RichFile.files
+      @items = case @type
+      when 'image'
+        RichFile.images
+      when 'video'
+        RichFile.videos
+      when 'file'
+        RichFile.files
+      when 'audio'
+        RichFile.audios
+      else
+        RichFile.all
+      end
       if params[:scoped] == 'true'
         @items = @items.where("owner_type = ? AND owner_id = ?", params[:scope_type], params[:scope_id])
       end
@@ -19,7 +29,7 @@ module Rich
         @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%")
       end
 
-      if params[:alpha].present?
+      if params[:alpha] == 'true'
         @items = @items.order("rich_file_file_name ASC")
       else
         @items = @items.order("created_at DESC")
@@ -58,7 +68,6 @@ module Rich
         @file.owner_type = params[:scope_type]
         @file.owner_id = params[:scope_id].to_i
       end
-
       # use the file from Rack Raw Upload
       file_params = params[:file] || params[:qqfile]
       if(file_params)
@@ -73,7 +82,6 @@ module Rich
                      :error => "Could not upload your file:\n- "+@file.errors.to_a[-1].to_s,
                      :params => params.inspect }
       end
-
       render :json => response, :content_type => "text/html"
     end
 

@@ -7,6 +7,9 @@ require "rich/engine"
 
 module Rich
 
+  image_types = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg']
+  video_types = ['application/mp4', 'video/mp4', 'audio/mp4', 'video/x-msvideo']
+  audio_types = ['audio/mpeg3', 'audio/x-mpeg-3', 'audio/mpeg']
   # configure image styles
   def self.image_styles
       @@image_styles.merge({ :rich_thumb => "100x100#" })
@@ -40,7 +43,13 @@ module Rich
   @@allow_embeds = false
 
   mattr_accessor :allowed_image_types
-  @@allowed_image_types = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg']
+  @@allowed_image_types = image_types
+
+  mattr_accessor :allowed_video_types
+  @@allowed_video_types = video_types
+
+  mattr_accessor :allowed_audio_types
+  @@allowed_audio_types = audio_types
 
   mattr_accessor :allowed_document_types
   @@allowed_document_types = :all
@@ -172,8 +181,20 @@ module Rich
       if allowed_image_types.include?(mime)
         true
       end
+    elsif simplified_type == 'video'
+      if allowed_video_types.include?(mime)
+        true
+      end
+    elsif simplified_type == 'audio'
+      if allowed_audio_types.include?(mime)
+        true
+      end  
     elsif simplified_type == "file"
-      if allowed_document_types == :all || allowed_document_types.include?(mime)
+      if (allowed_image_types + allowed_video_types + allowed_audio_types).exclude?(mime)
+        true
+      end
+    else
+      if allowed_document_types == :all
         true
       end
     end

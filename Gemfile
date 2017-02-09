@@ -15,7 +15,7 @@ gemspec
 
 #gem 'jquery-rails'
 #gem 'sass-rails'
-
+gem 'byebug'
 
 # Development: Formtastic
 #gem 'formtastic'

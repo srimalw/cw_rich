@@ -74,12 +74,17 @@ private
         klass = "class='rich-image-preview'"
         style = "style='max-width:#{editor_options[:preview_size]}; max-height:#{editor_options[:preview_size]};'"
         if path
+          if path == "broken"
+            %Q{
+              </br></br><img src='#{preview_image_path}' #{klass} #{style} />
+            }.html_safe
           %Q{
              </br></br><img src='#{preview_image_path}' #{klass} #{style} />
-          }.html_safe
+            }.html_safe
+          end
         else
           %Q{
-             </br></br><div #{klass} #{style}></div>
+            </br></br><div #{klass} #{style}></div>
           }.html_safe
         end
       end

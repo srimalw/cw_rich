@@ -4,8 +4,12 @@ require 'kaminari'
 
 module Rich
   class RichFile < ActiveRecord::Base
+		include Backends::Paperclip
     scope :images,  -> { where("rich_rich_files.simplified_type = 'image'") }
+    scope :videos,   -> { where("rich_rich_files.simplified_type = 'video'") }
     scope :files,   -> { where("rich_rich_files.simplified_type = 'file'") }
+    scope :audios,   -> { where("rich_rich_files.simplified_type = 'audio'") }
+    scope :any,   -> { }
 
     paginates_per Rich.options[:paginates_per]
   end

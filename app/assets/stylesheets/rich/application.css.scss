@@ -110,7 +110,7 @@ header {
   background: image-url('rich/loading.png') no-repeat center;
 }
 
-#insert-toggle, #view-toggle, #sort-toggle {
+#insert-toggle, #view-toggle, #sort-toggle, #folder {
   float: right;
   height: $headerHeight;
   overflow: hidden;
@@ -121,12 +121,16 @@ header {
   margin: 0 $margin 0 0;
 }
 
-#insert-many, #insert-one, #view-list, #view-grid, #sort-by-date, #sort-alphabetically {
+#insert-many, #insert-one, #view-list, #view-grid, #sort-by-date, #sort-alphabetically, #insert-folder {
   display: block;
   width: 16px;
   height: $headerHeight;
   text-indent: -9999em;
   background: no-repeat center;
+}
+
+#insert-folder{
+	background-image: image-url('rich/files.png');
 }
 
 #insert-many {

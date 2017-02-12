@@ -73,16 +73,26 @@ module Rich
       if(file_params)
         file_params.content_type = Mime::Type.lookup_by_extension(file_params.original_filename.split('.').last.to_sym)
         @file.rich_file = file_params
+      else
+        @file.rich_file_file_name = params[:file_name]
+        @file.rich_file_content_type = params[:simplified_type]
       end
 
       if @file.save
         response = { :success => true, :rich_id => @file.id }
+        # byebug
       else
         response = { :success => false,
                      :error => "Could not upload your file:\n- "+@file.errors.to_a[-1].to_s,
                      :params => params.inspect }
       end
-      render :json => response, :content_type => "text/html"
+
+      unless @file.simplified_type == 'folder'
+        render :json => response, :content_type => "text/html"
+      else
+        # byebug
+        redirect_to action: 'index', controller: 'rich/files'
+      end
     end
 
     def update

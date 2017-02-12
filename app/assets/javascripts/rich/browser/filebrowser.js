@@ -11,8 +11,18 @@ rich.Browser = function(){
 		loading: false,
 		reachedBottom: false,
 		viewModeGrid: true,
-    sortAlphabetically: false
+    sortAlphabetically: false,
+    newFolder: false // new folder
 	};
+
+  this._folder = {
+    CKEditor: 'picker',
+    authenticity_token: $("input[name='authenticity_token']").attr("value"),
+    scoped: false,
+    simplified_type: 'folder',
+    content_type: 'application/folder',
+    file_name: 'untitle'
+  };
 
 };
 
@@ -125,7 +135,11 @@ rich.Browser.prototype = {
 
 
 		if($.QueryString["CKEditor"]=='picker') {
-			window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
+      if (type == 'folder') {
+
+      } else {
+        window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
+      }
 		} else {
 			window.opener.CKEDITOR.tools.callFunction($.QueryString["CKEditorFuncNum"], url, id, name);
 		}
@@ -214,10 +228,11 @@ rich.Browser.prototype = {
       e.preventDefault();
       self.setLoading(true);
       var newFilename = $(this).find('input').val();
+      var fileId = $(this).find('id').val();
       $.ajax({
         url: p_tag.data('update-url'),
         type: 'PUT',
-        data: { filename: newFilename },
+        data: { filename: newFilename, id: fileId },
         success: function(data) {
           form.siblings('p').text(data.filename);
           form.siblings('img').attr('data-uris', data.uris);
@@ -227,6 +242,23 @@ rich.Browser.prototype = {
           self.setLoading(false);
         }
       });
+    });
+  },
+
+  insertNewFolder: function (argument) {
+    var _url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    this._options.newFolder = true;
+    $.ajax({
+      url: _url,
+      data: this._folder,
+      type: 'post',
+      dataType: 'script',
+      success: function(e) {
+        this._options.newFolder = false;
+      },
+      complete: function() {
+        location.reload();
+      }
     });
   }
 
@@ -293,4 +325,8 @@ $(function(){
     browser.showNameEditInput($(this));
   });
 
+  // insert folder
+  $('#insert-folder').on('click',function (e) {
+    browser.insertNewFolder();
+  })
 });

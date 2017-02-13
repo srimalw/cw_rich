@@ -8,18 +8,19 @@ module Rich
 
     def index
       @type = params[:type]
+      parent_id = params[:parent_id]
       # @items = @type == "image" ? RichFile.images : RichFile.files
       @items = case @type
       when 'image'
-        RichFile.images
+        RichFile.images(parent_id)
       when 'video'
-        RichFile.videos
+        RichFile.videos(parent_id)
       when 'file'
-        RichFile.files
+        RichFile.files(parent_id)
       when 'audio'
-        RichFile.audios
+        RichFile.audios(parent_id)
       else
-        RichFile.all
+        RichFile.any(parent_id)
       end
       if params[:scoped] == 'true'
         @items = @items.where("owner_type = ? AND owner_id = ?", params[:scope_type], params[:scope_id])
@@ -31,6 +32,10 @@ module Rich
 
       if params[:alpha] == 'true'
         @items = @items.order("rich_file_file_name ASC")
+        # @items = @items.group(:id,:simplified_type)
+        # items_order.where(simplified_type: 'folder').order("rich_file_file_name ASC")
+        # + items_order.where.not(simplified_type: 'folder').order("rich_file_file_name ASC")
+        # @items = @items.sor
       else
         @items = @items.order("created_at DESC")
       end
@@ -78,6 +83,8 @@ module Rich
         @file.rich_file_content_type = params[:simplified_type]
       end
 
+      @file.parent_id = params[:parent_id]
+
       if @file.save
         response = { :success => true, :rich_id => @file.id }
         # byebug
@@ -89,9 +96,12 @@ module Rich
 
       unless @file.simplified_type == 'folder'
         render :json => response, :content_type => "text/html"
+        # redirect_to action: 'index', controller: 'rich/files'
+
       else
         # byebug
-        redirect_to action: 'index', controller: 'rich/files'
+        render :json => response, :content_type => "text/html"
+        # redirect_to action: 'index', controller: 'rich/files'
       end
     end
 

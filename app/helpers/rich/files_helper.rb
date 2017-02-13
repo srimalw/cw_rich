@@ -36,6 +36,8 @@ module Rich
           asset_path 'icons/icon-txt.png'
         when 'video/mp4' || 'application/mp4' || 'audio/mp4'
           asset_path 'icons/icon-mp4.png'
+        when 'folder'
+          asset_path 'icons/icon-empty.png'
         else
           asset_path 'icons/icon-unknown.png'
         end

@@ -2,7 +2,7 @@
 
 var rich = rich || {};
 
-rich.Uploader = function(){
+rich.Uploader = function(parentId){
 	
 	this._options = {
 		uploadButtonId: 'upload',
@@ -10,7 +10,8 @@ rich.Uploader = function(){
 		uploadType: $.QueryString["type"],
 		scoped: $.QueryString["scoped"],
 		scope_type: $.QueryString["scope_type"],
-		scope_id: $.QueryString["scope_id"]
+		scope_id: $.QueryString["scope_id"],
+		parent_id: parentId
 	};
 	
 	// create the qq uploader
@@ -24,7 +25,8 @@ rich.Uploader = function(){
 		 	      simplified_type: this._options.uploadType,
 				  scoped: this._options.scoped,
 				  scope_type: this._options.scope_type,
-				  scope_id: this._options.scope_id
+				  scope_id: this._options.scope_id,
+				  parent_id: this._options.parent_id
 		},
 		debug: true,
 		onComplete: function(id, fileName, responseJSON) { self.uploadComplete(id, fileName, responseJSON); },

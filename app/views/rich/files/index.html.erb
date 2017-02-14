@@ -22,7 +22,11 @@
   </div>
 
   <div id="folder">
-    <a href="#" id="insert-folder" title="<%= t(:insert_folder) %>"><%= t(:insert_folder_tip) %></a>
+    <a href="" id="insert-folder" title="<%= t(:insert_folder) %>"><%= t(:insert_folder_tip) %></a>
+  </div>
+
+  <div id="back">
+    <a id="back-link" title="<%= t(:back_link) %>"><%= t(:back_link) %></a>
   </div>
 
   <ul id="styles" class="scopes">
@@ -46,6 +50,12 @@
     <p><%= t(:upload_a_file) %></p>
   </li>
 
-	<%= render :partial => "file", :collection => @items, :as => :file %>
+<%
+  @folders = @items.where(simplified_type: 'folder')
+  @files = @items.where.not(simplified_type: 'folder')
+%>
+
+	<%= render :partial => "file", :collection => @folders, :as => :file %>
+  <%= render :partial => "file", :collection => @files, :as => :file %>
 
 </ul>

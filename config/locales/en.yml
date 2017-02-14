@@ -21,6 +21,7 @@ en:
   filename_update_input_placeholder: "Name w/o extension"
   insert_folder: "New folder"
   insert_folder_tip: "insert new folder"
+  back_link: "previous folder"
   errors:
     messages:
       wrong_size: "is the wrong size (should be %{file_size})"

@@ -17,7 +17,8 @@ rich.AssetPicker.prototype = {
 		params.type = options.type || "image";
 		params.viewMode = options.view_mode || "grid";
 		params.scoped = options.scoped || false;
-		params.alpha = options.alpha || false;
+		params.alpha = options.alpha || true;
+		params.file_type = options.file_type || false;
 		params.parent_id = options.parent_id || 0;
 		if(params.scoped == true) {
 			params.scope_type = options.scope_type

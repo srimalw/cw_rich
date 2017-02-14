@@ -109,7 +109,7 @@ header {
   background: image-url('rich/loading.png') no-repeat center;
 }
 
-#insert-toggle, #view-toggle, #sort-toggle, #folder {
+#insert-toggle, #view-toggle, #sort-toggle, #folder, #back {
   float: right;
   height: $headerHeight;
   overflow: hidden;
@@ -120,12 +120,16 @@ header {
   margin: 0 $margin 0 0;
 }
 
-#insert-many, #insert-one, #view-list, #view-grid, #sort-by-date, #sort-alphabetically, #insert-folder {
+#insert-many, #insert-one, #view-list, #view-grid, #sort-by-date, #sort-alphabetically, #insert-folder, #back-link {
   display: block;
   width: 16px;
   height: $headerHeight;
   text-indent: -9999em;
   background: no-repeat center;
+}
+
+#back-link{
+	background-image: image-url('rich/back-icon.png');
 }
 
 #insert-folder{

@@ -11,9 +11,8 @@ rich.Browser = function(){
 		loading: false,
 		reachedBottom: false,
 		viewModeGrid: true,
-    sortAlphabetically: false,
-    newFolder: false, // new folder
-    parent_id: 0
+    sortAlphabetically: true,
+    previousParent: new Array()
 	};
 
   this._folder = {
@@ -137,22 +136,21 @@ rich.Browser.prototype = {
     var parent = $(item).data('rich-asset-parent');
     var self = this;
 
-    this._options.parent_id = id;
-    var newUrl = this.updateUrlParameter(this.urlWithParams(),id);
-
 		if($.QueryString["CKEditor"]=='picker') {
       if (type == 'folder') {
         this.showLoadingIconAndRefreshList();
         $.ajax({
-          url: newUrl,
+          url: this.updateUrlParameter(self.urlWithParams(),id),
           type: 'get',
           dataType: 'script',
           success: function(e) {
             self.setLoading(false);
+            self._options.previousParent.push(parent);
             self._folder.parent_id = id;
+            console.log(self._options.previousParent);
+            console.log(self._folder.parent_id);
           }
         });
-        // window.open(newUrl,'_top');
       } else {
         window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
       }
@@ -163,7 +161,7 @@ rich.Browser.prototype = {
     if (type != 'folder') {
       // wait a short while before closing the window or regaining focus
       window.setTimeout(function(){
-            if(self._options.insertionModeMany == false) {
+        if(self._options.insertionModeMany == false) {
           window.close();
         } else {
           window.focus();
@@ -171,6 +169,21 @@ rich.Browser.prototype = {
       },100);
     }
 	},
+
+  goBack: function () {
+
+    this._folder.parent_id = this._options.previousParent.pop();
+    this.showLoadingIconAndRefreshList();
+    var self = this;
+    $.ajax({
+      url: self.urlWithParams(),
+      type: 'get',
+      dataType: 'script',
+      success: function(e) {
+        self.setLoading(false);
+      }
+    });
+  },
 
   performSearch: function(query) {
     this.showLoadingIconAndRefreshList();
@@ -189,13 +202,14 @@ rich.Browser.prototype = {
 
   urlWithParams: function() {
     var url = window.location.href;
+    console.log(url);
     if (this._options.sortAlphabetically){
-      url += '&alpha=1';
+      url += '&alpha=false';
     }
     if (this._options.searchQuery) {
       url += '&search=' + this._options.searchQuery;
     }
-    return this.updateUrlParameter(url, this._options.parent_id);
+    return this.updateUrlParameter(url, this._folder.parent_id);
   },
 
   showLoadingIconAndRefreshList: function() {
@@ -279,7 +293,17 @@ rich.Browser.prototype = {
         self.setLoading(false);
       }
     });
-    window.open(self.urlWithParams(),'_parent');
+
+    this.showLoadingIconAndRefreshList();
+
+    $.ajax({
+      url: self.urlWithParams(),
+      type: 'get',
+      dataType: 'script',
+      success: function(e) {
+        self.setLoading(false);
+      }
+    });
   },
 
   updateUrlParameter: function (url, value) {
@@ -287,7 +311,7 @@ rich.Browser.prototype = {
   },
 
   returnParentId: function () {
-    return this._options.parent_id;
+    return this._folder.parent_id;
   }
 };
 
@@ -357,5 +381,9 @@ $(function(){
   // insert folder
   $('#insert-folder').on('click',function (e) {
     browser.insertNewFolder();
-  })
+  });
+
+  $('#back-link').on('click',function (e) {
+    browser.goBack();
+  });
 });

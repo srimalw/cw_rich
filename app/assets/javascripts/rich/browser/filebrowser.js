@@ -172,7 +172,9 @@ rich.Browser.prototype = {
 
   goBack: function () {
 
-    this._folder.parent_id = this._options.previousParent.pop();
+    this._folder.parent_id = this._options.previousParent != 0 ? this._options.previousParent.pop() : 0;
+    console.log(this._options.previousParent);
+    console.log(this._folder.parent_id);
     this.showLoadingIconAndRefreshList();
     var self = this;
     $.ajax({
@@ -280,10 +282,11 @@ rich.Browser.prototype = {
     });
   },
 
-  insertNewFolder: function (argument) {
+  insertNewFolder: function () {
     var _url = window.location.protocol + '//' + window.location.host + window.location.pathname;
     this.setLoading(true);
     var self = this;
+    console.log(this._folder);
     $.ajax({
       url: _url,
       data: this._folder,
@@ -295,6 +298,7 @@ rich.Browser.prototype = {
     });
 
     this.showLoadingIconAndRefreshList();
+    console.log(self._folder.parent_id);
 
     $.ajax({
       url: self.urlWithParams(),
@@ -323,7 +327,7 @@ $(function(){
 	browser = new rich.Browser();
 	browser.initialize();
 
-  $('#upload').click(function (argument) {
+  $('#upload').click(function () {
     new rich.Uploader(browser.returnParentId());
   });
 
@@ -359,8 +363,9 @@ $(function(){
 	});
 
 	// fluid pagination
-	$(window).scroll(function(){
+	$(window).scroll(function(e){
 		browser.loadNextPage();
+    e.preventDefault();
 	});
 
   // search bar, triggered after idling for 1 second
@@ -381,9 +386,12 @@ $(function(){
   // insert folder
   $('#insert-folder').on('click',function (e) {
     browser.insertNewFolder();
+    e.preventDefault();
   });
 
   $('#back-link').on('click',function (e) {
-    browser.goBack();
+    if (browser.returnParentId() != 0) {
+      browser.goBack();
+    }
   });
 });

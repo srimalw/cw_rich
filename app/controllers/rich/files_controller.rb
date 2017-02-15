@@ -8,8 +8,10 @@ module Rich
 
     def index
       @type = params[:type]
+      @search = params[:search].present?
       parent_id = params[:parent_id]
       file_type = params[:file_type] != 'false' ? params[:file_type].split(",").push('folder') : false
+      per_page = Rich.options[:paginates_per]
       # byebug
       # @items = @type == "image" ? RichFile.images : RichFile.files
       @items = case @type
@@ -50,41 +52,36 @@ module Rich
       end
 
       if params[:search].present?
+        # previous
         # @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%").where.not(simplified_type: 'folder')
 
-        # @items = RichFile.find(255).children
+        @items = RichFile.find_by_sql [
+          "WITH RECURSIVE recu AS (
+            SELECT *
+              FROM rich_rich_files
+              WHERE id = ?
+            UNION all
+            SELECT c.*
+              FROM recu p
+              JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
+          )
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id,"%#{params[:search]}%"]
 
-        # @items = @items.each do |item|
-        #   if item.children.any?
-        #     @items = item.children
-        #     continue
-        #   else
-        #     @items.merge(item)
-        #   end
-        # end
-
-        @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%").where.not(simplified_type: 'folder')
-
-        # @items = RichFile.find_by_sql ["WITH RECURSIVE recu AS (
-        #                                   SELECT *
-        #                                     FROM rich_rich_files
-        #                                     WHERE id = ?
-        #                                   UNION all
-        #                                   SELECT c.*
-        #                                     FROM recu p
-        #                                     JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
-        #                                 )
-        #                                 SELECT * FROM recu WHERE rich_file_file_name LIKE ? ;",parent_id,"%#{params[:search]}%"]
+        start_point = (params[:page].to_i) * per_page
+        end_point = (params[:page].to_i + 1) * per_page
+        @items = @items[start_point, per_page]
       end
 
-      if params[:alpha] == 'true'
+      if params[:alpha] == 'true' && !params[:search].present?
         @items = @items.order("simplified_type ASC")
         @items = @items.order("rich_file_file_name ASC")
-      else
+      elsif !params[:search].present?
         @items = @items.order("created_at DESC")
       end
 
-      @items = @items.page params[:page]
+      unless params[:search].present?
+        @items = @items.page params[:page]
+      end
 
       # stub for new file
       @rich_asset = RichFile.new
@@ -130,7 +127,7 @@ module Rich
       @file.parent_id = params[:parent_id]
 
       if @file.save
-        response = { :success => true, :rich_id => @file.id }
+        response = { :success => true, :rich_id => @file.id, :parent_id => params[:parent_id] }
         # byebug
       else
         response = { :success => false,
@@ -145,6 +142,7 @@ module Rich
       else
         # byebug
         render :json => response, :content_type => "text/html"
+        # byebug
         # redirect_to action: 'index', controller: 'rich/files'
       end
     end

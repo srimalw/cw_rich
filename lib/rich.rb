@@ -54,6 +54,9 @@ module Rich
   mattr_accessor :allowed_document_types
   @@allowed_document_types = :all
 
+  mattr_accessor :folder_level
+  @@folder_level = 3
+
   mattr_accessor :file_path
   @@file_path
 
@@ -115,7 +118,8 @@ module Rich
       :placeholder_image => self.placeholder_image,
       :preview_size => self.preview_size,
       :hidden_input => self.hidden_input,
-      :paginates_per => self.paginates_per
+      :paginates_per => self.paginates_per,
+      :folder_level => self.folder_level
     }
     editor_options = self.editor.merge(base)
 

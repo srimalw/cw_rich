@@ -12,7 +12,8 @@ rich.Browser = function(){
 		reachedBottom: false,
 		viewModeGrid: true,
     sortAlphabetically: true,
-    previousParent: new Array()
+    previousParent: new Array(),
+    maxLevel: $.QueryString["folder_level"]
 	};
 
   this._folder = {
@@ -22,9 +23,9 @@ rich.Browser = function(){
     simplified_type: 'folder',
     content_type: 'application/folder',
     file_name: 'untitle',
+    current_level: 0,
     parent_id: 0,
   };
-
 };
 
 rich.Browser.prototype = {
@@ -147,6 +148,8 @@ rich.Browser.prototype = {
             self.setLoading(false);
             self._options.previousParent.push(parent);
             self._folder.parent_id = id;
+            self._folder.current_level++;
+            console.log(self._folder.current_level);
             console.log(self._options.previousParent);
             console.log(self._folder.parent_id);
           }
@@ -183,6 +186,7 @@ rich.Browser.prototype = {
       dataType: 'script',
       success: function(e) {
         self.setLoading(false);
+        self._folder.current_level--;
       }
     });
   },
@@ -283,10 +287,17 @@ rich.Browser.prototype = {
   },
 
   insertNewFolder: function () {
+
+    if (this._folder.current_level > this._options.maxLevel) {
+      alert('max');
+      return;
+    }
+
     var _url = window.location.protocol + '//' + window.location.host + window.location.pathname;
     this.setLoading(true);
     var self = this;
     console.log(this._folder);
+
     $.ajax({
       url: _url,
       data: this._folder,

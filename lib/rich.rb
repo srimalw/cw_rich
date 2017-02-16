@@ -194,6 +194,7 @@ module Rich
         true
       end  
     elsif simplified_type == "file"
+      # other types; not (images, videos, audios)
       if (allowed_image_types + allowed_video_types + allowed_audio_types).exclude?(mime)
         true
       end

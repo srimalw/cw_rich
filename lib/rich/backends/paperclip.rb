@@ -24,6 +24,7 @@ module Rich
         rich_file_file_name
       end
 
+      # used for skipping folders
       def is_a_folder?
         self.rich_file_content_type == 'folder'
       end
@@ -65,7 +66,6 @@ module Rich
       def check_content_type
         unless self.rich_file_content_type == 'folder'
           self.rich_file.instance_write(:content_type, MIME::Types.type_for(rich_file_file_name)[0].content_type)
-          # byebug
           if !Rich.validate_mime_type(self.rich_file_content_type, self.simplified_type)
             self.errors[:base] << "'#{self.rich_file_file_name}' is not the right type."
           elsif self.simplified_type == 'all' && Rich.allowed_image_types.include?(self.rich_file_content_type)

@@ -11,11 +11,14 @@ rich.Browser = function(){
 		loading: false,
 		reachedBottom: false,
 		viewModeGrid: true,
-    sortAlphabetically: true,
+    sortAlphabetically: false,
+    // for back button
     previousParent: new Array(),
+    // to validate folder creation
     maxLevel: $.QueryString["folder_level"]
 	};
 
+  // following contains folders' data
   this._folder = {
     CKEditor: 'picker',
     authenticity_token: $("input[name='authenticity_token']").attr("value"),
@@ -23,6 +26,7 @@ rich.Browser = function(){
     simplified_type: 'folder',
     content_type: 'application/folder',
     file_name: 'untitle',
+    // current level only to validate
     current_level: 0,
     parent_id: 0,
   };
@@ -38,6 +42,14 @@ rich.Browser.prototype = {
 		this._options.insertionModeMany = ($.QueryString["insert_many"]=="true")?true:false;
 		this.toggleInsertionMode(false);
     	this.toggleViewMode(false);
+    // this._options.sortAlphabetically = ($.QueryString["alpha"]=="true")?true:false;
+    if ($.QueryString["alpha"]=="true") {
+      this._options.sortAlphabetically = true;
+      $('#sort-by-date').show();
+      $('#sort-alphabetically').hide();
+    }
+
+
 	},
 
 	initStyles: function(opt, def) {
@@ -138,8 +150,10 @@ rich.Browser.prototype = {
     var self = this;
 
 		if($.QueryString["CKEditor"]=='picker') {
+      // if selection is a folder
       if (type == 'folder') {
         this.showLoadingIconAndRefreshList();
+        // get items inside the folder
         $.ajax({
           url: this.updateUrlParameter(self.urlWithParams(),id),
           type: 'get',
@@ -147,11 +161,9 @@ rich.Browser.prototype = {
           success: function(e) {
             self.setLoading(false);
             self._options.previousParent.push(parent);
+            // change folders' parent and its' level
             self._folder.parent_id = id;
             self._folder.current_level++;
-            console.log(self._folder.current_level);
-            console.log(self._options.previousParent);
-            console.log(self._folder.parent_id);
           }
         });
       } else {
@@ -173,11 +185,11 @@ rich.Browser.prototype = {
     }
 	},
 
+  // back button function
   goBack: function () {
-
+    // validate at root end
     this._folder.parent_id = this._options.previousParent != 0 ? this._options.previousParent.pop() : 0;
-    console.log(this._options.previousParent);
-    console.log(this._folder.parent_id);
+
     this.showLoadingIconAndRefreshList();
     var self = this;
     $.ajax({
@@ -208,7 +220,6 @@ rich.Browser.prototype = {
 
   urlWithParams: function() {
     var url = window.location.href;
-    console.log(url);
     if (this._options.sortAlphabetically){
       url += '&alpha=false';
     }
@@ -287,16 +298,15 @@ rich.Browser.prototype = {
   },
 
   insertNewFolder: function () {
-
+    // validate current level before creation
     if (this._folder.current_level > this._options.maxLevel) {
-      alert('max');
+      alert('maximum level reached');
       return;
     }
-
+    // for POST
     var _url = window.location.protocol + '//' + window.location.host + window.location.pathname;
     this.setLoading(true);
     var self = this;
-    console.log(this._folder);
 
     $.ajax({
       url: _url,
@@ -305,26 +315,26 @@ rich.Browser.prototype = {
       dataType: 'json',
       success: function(e) {
         self.setLoading(false);
-      }
-    });
+        self.showLoadingIconAndRefreshList();
 
-    this.showLoadingIconAndRefreshList();
-    console.log(self._folder.parent_id);
-
-    $.ajax({
-      url: self.urlWithParams(),
-      type: 'get',
-      dataType: 'script',
-      success: function(e) {
-        self.setLoading(false);
+        $.ajax({
+          url: self.urlWithParams(),
+          type: 'get',
+          dataType: 'script',
+          success: function(e) {
+            self.setLoading(false);
+          }
+        });
       }
     });
   },
 
+  // update at url
   updateUrlParameter: function (url, value) {
     return url.replace(/(parent_id=)[^\&]+/, '$1' + value);
   },
 
+  // to parse parent to rich 'Uploader'
   returnParentId: function () {
     return this._folder.parent_id;
   }
@@ -400,6 +410,7 @@ $(function(){
     e.preventDefault();
   });
 
+  // back button
   $('#back-link').on('click',function (e) {
     if (browser.returnParentId() != 0) {
       browser.goBack();

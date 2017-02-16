@@ -10,10 +10,14 @@ module Rich
       @type = params[:type]
       @search = params[:search].present?
       parent_id = params[:parent_id]
+      current_page = params[:page].to_i
+
+      # to show specific file types, if have push 'folder' type to array
       file_type = params[:file_type] != 'false' ? params[:file_type].split(",").push('folder') : false
+
+      # items per page from config
       per_page = Rich.options[:paginates_per]
-      # byebug
-      # @items = @type == "image" ? RichFile.images : RichFile.files
+
       @items = case @type
       when 'image'
         unless file_type
@@ -34,6 +38,7 @@ module Rich
           RichFile.files(parent_id).where("rich_file_content_type in (?)", file_type)
         end
       when 'audio'
+        # byebug
         unless file_type
           RichFile.audios(parent_id)
         else
@@ -51,7 +56,7 @@ module Rich
         @items = @items.where("owner_type = ? AND owner_id = ?", params[:scope_type], params[:scope_id])
       end
 
-      if params[:search].present?
+      if @search
         # previous
         # @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%").where.not(simplified_type: 'folder')
 
@@ -67,19 +72,21 @@ module Rich
           )
             SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id,"%#{params[:search]}%"]
 
-        start_point = (params[:page].to_i) * per_page
-        end_point = (params[:page].to_i + 1) * per_page
+        # manual paginate
+        start_point = (current_page) * per_page
+        end_point = (current_page + 1) * per_page
         @items = @items[start_point, per_page]
       end
 
-      if params[:alpha] == 'true' && !params[:search].present?
-        @items = @items.order("simplified_type ASC")
-        @items = @items.order("rich_file_file_name ASC")
-      elsif !params[:search].present?
+      if params[:alpha] == 'true' && !@search
+        @items = @items.order("simplified_type ASC").order("rich_file_file_name ASC")
+        # @items = @items.order("rich_file_file_name ASC")
+      elsif !@search
         @items = @items.order("created_at DESC")
       end
 
-      unless params[:search].present?
+      # byepass search
+      unless @search
         @items = @items.page params[:page]
       end
 
@@ -107,7 +114,9 @@ module Rich
     end
 
     def create
-      if params[:current_level].to_i > Rich.options[:folder_level]
+
+      # validate folder level at folder creation
+      if params[:current_level].to_i > Rich.options[:folder_level] && params[:simplified_type] == 'folder'
         return
       end
 
@@ -123,31 +132,25 @@ module Rich
         file_params.content_type = Mime::Type.lookup_by_extension(file_params.original_filename.split('.').last.to_sym)
         @file.rich_file = file_params
       else
+        # folder creation
         @file.rich_file_file_name = params[:file_name]
         @file.rich_file_content_type = params[:simplified_type]
       end
 
+      # save its' parent id
       @file.parent_id = params[:parent_id]
 
       if @file.save
-        response = { :success => true, :rich_id => @file.id, :parent_id => params[:parent_id] }
-        # byebug
+        response = {  :success => true,
+                      :rich_id => @file.id,
+                      :parent_id => params[:parent_id] }
       else
         response = { :success => false,
                      :error => "Could not upload your file:\n- "+@file.errors.to_a[-1].to_s,
                      :params => params.inspect }
       end
+      render :json => response, :content_type => "text/html"
 
-      unless @file.simplified_type == 'folder'
-        render :json => response, :content_type => "text/html"
-        # redirect_to action: 'index', controller: 'rich/files'
-
-      else
-        # byebug
-        render :json => response, :content_type => "text/html"
-        # byebug
-        # redirect_to action: 'index', controller: 'rich/files'
-      end
     end
 
     def update

@@ -60,7 +60,22 @@ module Rich
         # previous
         # @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%").where.not(simplified_type: 'folder')
 
-        @items = RichFile.find_by_sql [
+        search_file_type = params[:type].to_s
+
+        unless search_file_type == 'all'
+          @items = RichFile.find_by_sql [
+          "WITH RECURSIVE recu AS (
+            SELECT *
+              FROM rich_rich_files
+              WHERE id = ?
+            UNION all
+            SELECT c.*
+              FROM recu p
+              JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
+          )
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;", parent_id, "%#{params[:search]}%", search_file_type]
+        else
+          @items = RichFile.find_by_sql [
           "WITH RECURSIVE recu AS (
             SELECT *
               FROM rich_rich_files
@@ -71,6 +86,7 @@ module Rich
               JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
           )
             SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id,"%#{params[:search]}%"]
+        end
 
         # manual paginate
         start_point = (current_page) * per_page

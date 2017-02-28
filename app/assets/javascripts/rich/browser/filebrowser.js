@@ -120,7 +120,7 @@ rich.Browser.prototype = {
   toggleSortOrder: function(switchMode) {
     if(switchMode==true) this._options.sortAlphabetically = !this._options.sortAlphabetically;
 
-    if(this._options.sortAlphabetically == true) {
+    if(this._options.sortAlphabetically == false) {
       $('#sort-by-date').hide();
       $('#sort-alphabetically').show();
     } else {

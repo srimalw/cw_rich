@@ -44,7 +44,7 @@ rich.Browser.prototype = {
     	this.toggleViewMode(false);
     // this._options.sortAlphabetically = ($.QueryString["alpha"]=="true")?true:false;
     if ($.QueryString["alpha"]=="true") {
-      this._options.sortAlphabetically = true;
+      this._options.sortAlphabetically = false;
       $('#sort-by-date').show();
       $('#sort-alphabetically').hide();
     }
@@ -120,7 +120,7 @@ rich.Browser.prototype = {
   toggleSortOrder: function(switchMode) {
     if(switchMode==true) this._options.sortAlphabetically = !this._options.sortAlphabetically;
 
-    if(this._options.sortAlphabetically == false) {
+    if(this._options.sortAlphabetically == true) {
       $('#sort-by-date').hide();
       $('#sort-alphabetically').show();
     } else {
@@ -367,7 +367,7 @@ $(function(){
   });
 
   // hook up sort order switching
-  $('#sort-by-date, #sort-alphabetically').click(function(e){
+  $('#sort-alphabetically, #sort-by-date').click(function(e){
     browser.toggleSortOrder(true);
     e.preventDefault();
     return false;

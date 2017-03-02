@@ -6,10 +6,13 @@ module Rich
 
     layout "rich/application"
 
+    @@parent_folder = 0
+
     def index
       @type = params[:type]
       @search = params[:search].present?
       parent_id = params[:parent_id]
+      @@parent_folder = params[:parent_id]
       current_page = params[:page].to_i
 
       # to show specific file types, if have push 'folder' type to array
@@ -154,12 +157,12 @@ module Rich
       end
 
       # save its' parent id
-      @file.parent_id = params[:parent_id]
+      @file.parent_id = @@parent_folder
 
       if @file.save
         response = {  :success => true,
                       :rich_id => @file.id,
-                      :parent_id => params[:parent_id] }
+                      :parent_id => @@parent_folder }
       else
         response = { :success => false,
                      :error => "Could not upload your file:\n- "+@file.errors.to_a[-1].to_s,

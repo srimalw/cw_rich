@@ -164,6 +164,7 @@ rich.Browser.prototype = {
             // change folders' parent and its' level
             self._folder.parent_id = id;
             self._folder.current_level++;
+            console.log(self._folder.parent_id);
           }
         });
       } else {
@@ -336,6 +337,7 @@ rich.Browser.prototype = {
 
   // to parse parent to rich 'Uploader'
   returnParentId: function () {
+    console.log(this._folder.parent_id);
     return this._folder.parent_id;
   }
 };
@@ -348,7 +350,8 @@ $(function(){
 	browser = new rich.Browser();
 	browser.initialize();
 
-  $('#upload').click(function () {
+  $('#upload').on('click',function (e) {
+    console.log('from onclick: '+browser.returnParentId());
     new rich.Uploader(browser.returnParentId());
   });
 
@@ -412,6 +415,7 @@ $(function(){
 
   // back button
   $('#back-link').on('click',function (e) {
+    // console.log(browser.returnParentId());
     if (browser.returnParentId() != 0) {
       browser.goBack();
     }

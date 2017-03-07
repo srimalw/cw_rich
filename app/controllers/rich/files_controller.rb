@@ -71,11 +71,11 @@ module Rich
           "WITH RECURSIVE recu AS (
             SELECT *
               FROM rich_rich_files
-              WHERE id = ?
+              WHERE parent_id = ?
             UNION all
             SELECT c.*
               FROM recu p
-              JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
+              JOIN rich_rich_files c ON c.parent_id = p.id AND p.id != p.parent_id
           )
             SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;", parent_id.to_i, "%#{params[:search]}%", search_file_type]
         else
@@ -83,11 +83,11 @@ module Rich
           "WITH RECURSIVE recu AS (
             SELECT *
               FROM rich_rich_files
-              WHERE id = ?
+              WHERE parent_id = ?
             UNION all
             SELECT c.*
               FROM recu p
-              JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
+              JOIN rich_rich_files c ON c.parent_id = p.id AND p.id != p.parent_id
           )
             SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id.to_i,"%#{params[:search]}%"]
         end

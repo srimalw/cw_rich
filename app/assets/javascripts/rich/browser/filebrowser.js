@@ -398,7 +398,7 @@ $(function(){
     clearTimeout(richSearchTimeout);
     var input = this;
     richSearchTimeout = setTimeout(function() {
-      browser.performSearch(($(input).val()).replace(' ','-'));
+      browser.performSearch($(input).val());
     }, 1000);
   });
 

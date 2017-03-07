@@ -11,7 +11,8 @@ module Rich
     def index
       @type = params[:type]
       @search = params[:search].present?
-      parent_id = params[:parent_id]
+      # parent id change
+      parent_id = params[:parent_id].nil? ? 0 : params[:parent_id]
       @@parent_folder = params[:parent_id]
       current_page = params[:page].to_i
 

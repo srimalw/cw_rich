@@ -12,7 +12,7 @@ module Rich
       @type = params[:type]
       @search = params[:search].present?
       # parent id change
-      parent_id = params[:parent_id].nil? ? 0 : params[:parent_id]
+      parent_id = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
       @@parent_folder = params[:parent_id]
       current_page = params[:page].to_i
 
@@ -77,7 +77,7 @@ module Rich
               FROM recu p
               JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
           )
-            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;", parent_id, "%#{params[:search]}%", search_file_type]
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;", parent_id.to_i, "%#{params[:search]}%", search_file_type]
         else
           @items = RichFile.find_by_sql [
           "WITH RECURSIVE recu AS (
@@ -89,7 +89,7 @@ module Rich
               FROM recu p
               JOIN rich_rich_files c ON c.parent_id = p.id AND c.parent_id != c.id
           )
-            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id,"%#{params[:search]}%"]
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id.to_i,"%#{params[:search]}%"]
         end
 
         # manual paginate

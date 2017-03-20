@@ -1,1 +1,7 @@
-$("#file<%= @fileid %>").parent().remove();
+<% if !@fileid.nil? %>
+	$("#file<%= @fileid %>").parent().remove();
+<% elsif !@error.nil? %>
+	alert("<%= @error %>");
+<% else %>
+	//
+<% end %>

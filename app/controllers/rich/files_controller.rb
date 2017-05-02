@@ -187,6 +187,7 @@ module Rich
       if(params[:id])
         begin
           @rich_file.destroy
+          @fileid = params[:id]
         rescue Exception => e
           @error = 'sorry cannot delete'
         end

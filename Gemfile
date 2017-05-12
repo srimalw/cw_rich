@@ -16,6 +16,7 @@ gemspec
 #gem 'jquery-rails'
 #gem 'sass-rails'
 gem 'byebug'
+gem 'paperclip-av-transcoder'
 
 # Development: Formtastic
 #gem 'formtastic'

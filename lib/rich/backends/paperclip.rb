@@ -32,6 +32,8 @@ module Rich
       def set_styles
         if self.simplified_type=="image" || self.rich_file_content_type.to_s["image"]
           Rich.image_styles
+        elsif self.simplified_type=="video" || self.rich_file_content_type.to_s["video"]
+          Rich.video_styles
         else
           {}
         end

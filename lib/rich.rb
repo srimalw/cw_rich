@@ -17,8 +17,21 @@ module Rich
   def self.image_styles=(image_styles)
     @@image_styles = image_styles
   end
+
+  def self.video_styles
+    @@video_styles.merge({ :rich_thumb => { :geometry => "320x240", :format => 'mp4', :processors => [:transcoder] } })
+  end
+  def self.video_styles=(video_styles)
+    @@video_styles = video_styles
+  end
+
   @@image_styles = {
     :thumb => "100x100#"
+  }
+
+  @@video_styles = {
+    :medium => { :geometry => "640x480", :format => 'mp4', :processors => [:transcoder] },
+    :thumb => { :geometry => "320x240", :format => 'mp4', :processors => [:transcoder] }
   }
 
   mattr_accessor :convert_options

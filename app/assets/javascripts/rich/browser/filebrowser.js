@@ -149,30 +149,33 @@ rich.Browser.prototype = {
     var parent = $(item).data('rich-asset-parent');
     var self = this;
 
-		if($.QueryString["CKEditor"]=='picker') {
+		// if($.QueryString["CKEditor"]=='picker') {
       // if selection is a folder
-      if (type == 'folder') {
-        this.showLoadingIconAndRefreshList();
-        // get items inside the folder
-        $.ajax({
-          url: this.updateUrlParameter(self.urlWithParams(),id),
-          type: 'get',
-          dataType: 'script',
-          success: function(e) {
-            self.setLoading(false);
-            self._options.previousParent.push(parent);
-            // change folders' parent and its' level
-            self._folder.parent_id = id;
-            self._folder.current_level++;
-            console.log(self._folder.parent_id);
-          }
-        });
-      } else {
+    if (type == 'folder') {
+      this.showLoadingIconAndRefreshList();
+      // get items inside the folder
+      $.ajax({
+        url: this.updateUrlParameter(self.urlWithParams(),id),
+        type: 'get',
+        dataType: 'script',
+        success: function(e) {
+          self.setLoading(false);
+          self._options.previousParent.push(parent);
+          // change folders' parent and its' level
+          self._folder.parent_id = id;
+          self._folder.current_level++;
+          console.log(self._folder.parent_id);
+        }
+      });
+    } else {
+      if($.QueryString["CKEditor"]=='picker') {
         window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
       }
-		} else {
-			window.opener.CKEDITOR.tools.callFunction($.QueryString["CKEditorFuncNum"], url, id, name);
-		}
+      window.opener.CKEDITOR.tools.callFunction($.QueryString["CKEditorFuncNum"], url, id, name);
+    }
+		// } else {
+		// 	window.opener.CKEDITOR.tools.callFunction($.QueryString["CKEditorFuncNum"], url, id, name);
+		// }
 
     if (type != 'folder') {
       // wait a short while before closing the window or regaining focus
@@ -332,12 +335,17 @@ rich.Browser.prototype = {
 
   // update at url
   updateUrlParameter: function (url, value) {
-    return url.replace(/(parent_id=)[^\&]+/, '$1' + value);
+    if (url.search('parent_id') != -1) {
+      return url.replace(/(parent_id=)[^\&]+/, '$1' + value);
+    } else {
+      return (url += '&parent_id=' + value);
+    }
+
   },
 
   // to parse parent to rich 'Uploader'
   returnParentId: function () {
-    console.log(this._folder.parent_id);
+    // console.log(this._folder.parent_id);
     return this._folder.parent_id;
   }
 };

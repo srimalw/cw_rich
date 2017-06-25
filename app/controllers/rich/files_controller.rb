@@ -9,8 +9,14 @@ module Rich
     @@parent_folder = 0
 
     def index
+      # byebug
       @type = params[:type]
       @search = params[:search].present?
+      # -- v
+      # -- file_type is files format filter
+      # -- vaidate for rich 'picker' but not 'editor' at JS params
+      params[:file_type] = params[:file_type] || 'false';
+      # --^
       # parent id change
       parent_id = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
       @@parent_folder = params[:parent_id]
@@ -18,7 +24,6 @@ module Rich
 
       # to show specific file types, if have push 'folder' type to array
       file_type = params[:file_type] != 'false' ? params[:file_type].split(",").push('folder') : false
-
       # items per page from config
       per_page = Rich.options[:paginates_per]
 

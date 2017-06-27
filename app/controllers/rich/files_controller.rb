@@ -16,10 +16,12 @@ module Rich
       # -- file_type is files format filter
       # -- vaidate for rich 'picker' but not 'editor' at JS params
       params[:file_type] = params[:file_type] || 'false';
+      params[:alpha] = params[:alpha] || 'true';
+      # byebug
       # --^
       # parent id change
       parent_id = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
-      @@parent_folder = params[:parent_id]
+      @@parent_folder = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
       current_page = params[:page].to_i
 
       # to show specific file types, if have push 'folder' type to array
@@ -103,6 +105,8 @@ module Rich
         @items = @items[start_point, per_page]
       end
 
+      # byebug
+
       if params[:alpha] == 'true' && !@search
         @items = @items.order("simplified_type ASC").order("rich_file_file_name ASC")
         # @items = @items.order("rich_file_file_name ASC")
@@ -140,6 +144,7 @@ module Rich
 
     def create
 
+      # byebug
       # validate folder level at folder creation
       if params[:current_level].to_i > Rich.options[:folder_level] && params[:simplified_type] == 'folder'
         return

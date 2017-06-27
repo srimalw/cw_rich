@@ -20,7 +20,7 @@ rich.Browser = function(){
 
   // following contains folders' data
   this._folder = {
-    CKEditor: 'picker',
+    // CKEditor: 'picker',
     authenticity_token: $("input[name='authenticity_token']").attr("value"),
     scoped: false,
     simplified_type: 'folder',

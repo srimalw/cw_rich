@@ -48,8 +48,6 @@ rich.Browser.prototype = {
       $('#sort-by-date').show();
       $('#sort-alphabetically').hide();
     }
-
-
 	},
 
 	initStyles: function(opt, def) {

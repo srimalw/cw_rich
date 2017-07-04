@@ -129,11 +129,16 @@ header {
 }
 
 #back-link{
-	background-image: image-url('rich/back-icon.png');
+	background-image: image-url('rich/pointing-arrow-grey.png');
+	background-size: 16px 19px;
+	width: 20px;
+	height: 46px;
+	cursor: pointer;
 }
 
 #insert-folder{
-	background-image: image-url('rich/files.png');
+	background-image: image-url('rich/folder.png');
+	background-size: 22px;
 }
 
 #insert-many {

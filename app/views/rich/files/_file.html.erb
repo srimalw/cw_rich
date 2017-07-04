@@ -19,7 +19,7 @@
       file.simplified_type == 'folder' ? confirm_message = :delete_confirm_folder : confirm_message = :delete_confirm
   %>
 
-  <% unless file.id == -1 %>
+  <% unless file.id == -1 || file.parent_id == -1 %>
     <%= link_to "delete", "/rich/files/"+file.id.to_s, :method => :delete, :remote => true, :data => { :confirm => t(confirm_message) }, :class => "delete", :title => t(:delete) %>
   <% end %>
 </li>

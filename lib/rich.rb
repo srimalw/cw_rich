@@ -12,7 +12,7 @@ module Rich
   audio_types = ['audio/mpeg3', 'audio/x-mpeg-3', 'audio/mpeg']
   # configure image styles
   def self.image_styles
-      @@image_styles.merge({ :rich_thumb => "100x100#" })
+    @@image_styles.merge({ :rich_thumb => "100x100#" })
   end
   def self.image_styles=(image_styles)
     @@image_styles = image_styles

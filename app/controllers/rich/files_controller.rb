@@ -15,34 +15,52 @@ module Rich
       # -- v
       # -- file_type is files format filter
       # -- vaidate for rich 'picker' but not 'editor' at JS params
-      file_type = params[:file_type] || 'false';
-      alpha = params[:alpha] || 'true';
+      params[:file_type] = params[:file_type] || 'false';
+      params[:alpha] = params[:alpha] || 'true';
+      # byebug
       # --^
       # parent id change
-      parent_id = (params[:parent_id].nil?) ? 0 : params[:parent_id].to_i
-      @@parent_folder = parent_id
+      parent_id = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
+      @@parent_folder = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
+      current_page = params[:page].to_i
 
       # to show specific file types, if have push 'folder' type to array
-      file_type = (file_type != 'false') ? file_type.split(",").push('folder') : []
+      file_type = params[:file_type] != 'false' ? params[:file_type].split(",").push('folder') : false
       # items per page from config
       per_page = Rich.options[:paginates_per]
-      current_page = params[:page].to_i
 
       @items = case @type
       when 'image'
-        RichFile.images(parent_id)
+        unless file_type
+          RichFile.images(parent_id)
+        else
+          RichFile.images(parent_id).where("rich_file_content_type in (?)", file_type)
+        end
       when 'video'
-        RichFile.videos(parent_id)
+        unless file_type
+          RichFile.videos(parent_id)
+        else
+          RichFile.videos(parent_id).where("rich_file_content_type in (?)", file_type)
+        end
       when 'file'
-        RichFile.files(parent_id)
+        unless file_type
+          RichFile.files(parent_id)
+        else
+          RichFile.files(parent_id).where("rich_file_content_type in (?)", file_type)
+        end
       when 'audio'
-        RichFile.audios(parent_id)
+        # byebug
+        unless file_type
+          RichFile.audios(parent_id)
+        else
+          RichFile.audios(parent_id).where("rich_file_content_type in (?)", file_type)
+        end
       else
-        RichFile.any(parent_id)
-      end
-
-      if file_type.blank?
-        @items.where("rich_file_content_type in (?)", file_type)
+        unless file_type
+          RichFile.any(parent_id)
+        else
+          RichFile.any(parent_id).where("rich_file_content_type in (?)", file_type)
+        end
       end
 
       if params[:scoped] == 'true'
@@ -53,22 +71,32 @@ module Rich
         # previous
         # @items = @items.where('rich_file_file_name LIKE ?', "%#{params[:search]}%").where.not(simplified_type: 'folder')
 
-        partial_query = "WITH RECURSIVE recu AS (
-                          SELECT *
-                            FROM rich_rich_files
-                            WHERE parent_id = ?
-                          UNION all
-                          SELECT c.*
-                            FROM recu p
-                            JOIN rich_rich_files c ON c.parent_id = p.id AND p.id != p.parent_id
-                        )"
+        search_file_type = params[:type].to_s
 
-        unless @type == 'all'
-          partial_query << " SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;"
-          @items = RichFile.find_by_sql [ partial_query, parent_id.to_i, "%#{params[:search].gsub(' ','-')}%", @type]
+        unless search_file_type == 'all'
+          @items = RichFile.find_by_sql [
+          "WITH RECURSIVE recu AS (
+            SELECT *
+              FROM rich_rich_files
+              WHERE parent_id = ?
+            UNION all
+            SELECT c.*
+              FROM recu p
+              JOIN rich_rich_files c ON c.parent_id = p.id AND p.id != p.parent_id
+          )
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND simplified_type = ? ORDER BY simplified_type ASC, rich_file_file_name ASC;", parent_id.to_i, "%#{params[:search].gsub(' ','-')}%", search_file_type]
         else
-          partial_query << " SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;"
-          @items = RichFile.find_by_sql [ partial_query, parent_id.to_i, "%#{params[:search].gsub(' ','-')}%"]
+          @items = RichFile.find_by_sql [
+          "WITH RECURSIVE recu AS (
+            SELECT *
+              FROM rich_rich_files
+              WHERE parent_id = ?
+            UNION all
+            SELECT c.*
+              FROM recu p
+              JOIN rich_rich_files c ON c.parent_id = p.id AND p.id != p.parent_id
+          )
+            SELECT * FROM recu WHERE rich_file_file_name LIKE ? AND NOT simplified_type = 'folder' ORDER BY simplified_type ASC, rich_file_file_name ASC;",parent_id.to_i,"%#{params[:search].gsub(' ','-')}%"]
         end
 
         # manual paginate
@@ -77,7 +105,9 @@ module Rich
         @items = @items[start_point, per_page]
       end
 
-      if alpha == 'true' && !@search
+      # byebug
+
+      if params[:alpha] == 'true' && !@search
         @items = @items.order("simplified_type ASC").order("rich_file_file_name ASC")
         # @items = @items.order("rich_file_file_name ASC")
       elsif !@search
@@ -96,10 +126,12 @@ module Rich
         format.html
         format.js
       end
+
     end
 
     def show
       # show is used to retrieve single files through XHR requests after a file has been uploaded
+
       if(params[:id])
         # list all files
         @file = @rich_file
@@ -107,15 +139,18 @@ module Rich
       else
         render :text => "File not found"
       end
+
     end
 
     def create
+
+      # byebug
       # validate folder level at folder creation
       if params[:current_level].to_i > Rich.options[:folder_level] && params[:simplified_type] == 'folder'
         return
       end
 
-      @file = RichFile.new(simplified_type: params[:simplified_type])
+      @file = RichFile.new(:simplified_type => params[:simplified_type])
 
       if(params[:scoped] == 'true')
         @file.owner_type = params[:scope_type]

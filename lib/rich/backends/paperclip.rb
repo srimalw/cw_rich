@@ -78,7 +78,6 @@ module Rich
             self.simplified_type = 'audio'
           end
         end
-        byebug
       end
 
       def cache_style_uris
@@ -95,7 +94,6 @@ module Rich
       end
 
       def clean_file_name
-        byebug
         extension = File.extname(rich_file_file_name).gsub(/^\.+/, '')
         filename = rich_file_file_name.gsub(/\.#{extension}$/, '')
 

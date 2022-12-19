@@ -143,8 +143,6 @@ module Rich
     end
 
     def create
-
-      byebug
       # validate folder level at folder creation
       if params[:current_level].to_i > Rich.options[:folder_level] && params[:simplified_type] == 'folder'
         return

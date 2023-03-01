@@ -33,12 +33,15 @@ class RichFileUploader < CarrierWave::Uploader::Base
 
   Rich.image_styles.each do |name,size|
     version name do
-      process :resize_to_fit => size.gsub("#", "").split("x").map(&:to_i)
+      process :resize_to_fill => size.gsub("#", "").split("x").map(&:to_i).push("Center")
     end
   end
 
   # version :rich_thumb do
   #   process :resize_to_fit => [100, 100]
+  # end
+  # version :medium do
+  #   process :resize_to_fill => [300, 225, 'Center']
   # end
 
   # Add a white list of extensions which are allowed to be uploaded.

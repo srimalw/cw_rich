@@ -4,10 +4,10 @@ require 'kaminari'
 
 module Rich
   class RichFile < ActiveRecord::Base
-		include Backends::CarrierWave
+		include Backends::Paperclip
 
-    # belongs_to :parent, class_name: "RichFile"
-    # has_many :children, class_name: "RichFile", foreign_key: :parent_id, dependent: :destroy
+    belongs_to :parent, class_name: "RichFile"
+    has_many :children, class_name: "RichFile", foreign_key: :parent_id, dependent: :destroy
 
     scope :images,  -> (id) { where("simplified_type in (?)",['image', 'folder']).where(parent_id: id) }
     scope :videos,   -> (id) { where("simplified_type in (?)",['video', 'folder']).where(parent_id: id) }

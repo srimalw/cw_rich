@@ -9,7 +9,6 @@ module Rich
     @@parent_folder = 0
 
     def index
-      # byebug
       @type = params[:type]
       @search = params[:search].present?
       # -- v
@@ -17,7 +16,6 @@ module Rich
       # -- vaidate for rich 'picker' but not 'editor' at JS params
       params[:file_type] = params[:file_type] || 'false';
       params[:alpha] = params[:alpha] || 'true';
-      # byebug
       # --^
       # parent id change
       parent_id = params[:parent_id].nil? ? 0 : params[:parent_id].to_i
@@ -49,7 +47,6 @@ module Rich
           RichFile.files(parent_id).where("rich_file_content_type in (?)", file_type)
         end
       when 'audio'
-        # byebug
         unless file_type
           RichFile.audios(parent_id)
         else
@@ -105,7 +102,6 @@ module Rich
         @items = @items[start_point, per_page]
       end
 
-      # byebug
 
       if params[:alpha] == 'true' && !@search
         @items = @items.order("simplified_type ASC").order("rich_file_file_name ASC")
@@ -143,7 +139,6 @@ module Rich
     end
 
     def create
-      byebug
       # validate folder level at folder creation
       if params[:current_level].to_i > Rich.options[:folder_level] && params[:simplified_type] == 'folder'
         return

@@ -140,7 +140,11 @@ rich.Browser.prototype = {
     },
 
     selectItem: function (item) {
-        var url = $(item).data('uris')[this._options.currentStyle];
+        // var url = $(item).data('uris')[this._options.currentStyle];
+        let host = window.location.host
+        let hostName = window.location.hostname
+        let baseUrl = hostName == "localhost" ? `${window.location.protocol}//${host}` : `${window.location.protocol}//${hostName}`
+        var url = `${baseUrl}/${$(item).data('uris')[this._options.currentStyle]}`;
         var id = $(item).data('rich-asset-id');
         var type = $(item).data('rich-asset-type');
         var name = $(item).data('rich-asset-name');

@@ -4,7 +4,7 @@ require 'kaminari'
 
 module Rich
   class RichFile < ActiveRecord::Base
-		include Backends::Paperclip
+		require_relative '../../../lib/rich/backends/paperclip'
 
     belongs_to :parent, class_name: "RichFile"
     has_many :children, class_name: "RichFile", foreign_key: :parent_id, dependent: :destroy

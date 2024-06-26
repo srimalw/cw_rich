@@ -171,7 +171,13 @@ rich.Browser.prototype = {
             });
         } else {
             if ($.QueryString["CKEditor"] == 'picker') {
-                window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
+                if(url.includes("undefined") && url.split('/').pop() == "undefined"){
+                    let modifiedUrl = item.dataset.uris.split(':')[1].replace('}','')
+                    window.opener.assetPicker.setAsset($.QueryString["dom_id"], modifiedUrl, id, type);
+                }
+                else{
+                    window.opener.assetPicker.setAsset($.QueryString["dom_id"], url, id, type);
+                }
             }
             window.opener.CKEDITOR.tools.callFunction($.QueryString["CKEditorFuncNum"], url, id, name);
         }

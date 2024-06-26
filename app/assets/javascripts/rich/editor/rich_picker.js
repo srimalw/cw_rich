@@ -38,8 +38,19 @@ rich.AssetPicker.prototype = {
 			$(dom_id).val(asset);
 		}
 
+		let previewContainer = $(dom_id).siblings('.preview')[0]
+		let previewElements = $(previewContainer).children()
+
+		previewElements.each((index, element)=> {
+			$(element).remove()
+		})
+
     if(type=='image') {
-		  $(dom_id).siblings('img.rich-image-preview').first().attr({src: asset});
+			$(previewContainer).append(`<img class='rich-image-preview' src=${asset}/>`)
+    }
+		// if file type is not image
+    else if(type=='all') {
+			$(previewContainer).append(`<a href=${asset} target=_blank>attachment</a>`)
     }
   },
 

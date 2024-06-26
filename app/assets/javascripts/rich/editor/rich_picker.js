@@ -50,7 +50,7 @@ rich.AssetPicker.prototype = {
     }
 		// if file type is not image
     else if(type=='all') {
-			$(previewContainer).append(`<a href=${asset}>attachment</a>`)
+			$(previewContainer).append(`<a href=${asset} target=_blank>attachment</a>`)
     }
   },
 

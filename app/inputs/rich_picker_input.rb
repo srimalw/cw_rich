@@ -82,8 +82,8 @@ if (Object.const_defined?("Formtastic") && Gem.loaded_specs["formtastic"].versio
               });
             });
 
-            function attachemtPreview(e){
-              window.open('#{file_url}');
+            function attachemtPreview(path){
+              window.open(path);
             }
           </script>
       }.html_safe
@@ -119,7 +119,7 @@ if (Object.const_defined?("Formtastic") && Gem.loaded_specs["formtastic"].versio
           <div class=preview>
             <span class=attachment 
                   style='cursor: pointer; color: #3535cc; text-decoration: underline;'
-                  onclick='attachemtPreview()'
+                  onclick='attachemtPreview("#{path}")'
             >
               #{file_name}
             </span>

@@ -46,7 +46,7 @@ rich.AssetPicker.prototype = {
 		})
 
     if(type=='image') {
-			$(previewContainer).append(`<img class='rich-image-preview' src=${asset}/>`)
+			$(previewContainer).append(`<img class='rich-image-preview' src="${asset}">`)
     }
 		// if file type is not image
     else if(type=='all') {

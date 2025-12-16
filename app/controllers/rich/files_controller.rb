@@ -1,6 +1,6 @@
 module Rich
   class FilesController < ApplicationController
-
+    skip_before_action :verify_authenticity_token, only: :create
     before_action :authenticate_rich_user
     before_action :set_rich_file, only: [:show, :update, :destroy]
 

@@ -16,22 +16,33 @@ rich.Uploader = function(parentId){
 	
 	// create the qq uploader
 	var self = this;
-	var uploader = new qq.FileUploaderBasic({
-	  button: document.getElementById(self._options.uploadButtonId),
-		multiple: true,
-		maxConnections: 3,
-		action: $("#new_rich_file").attr("action"),
-		params: { authenticity_token: $("input[name='authenticity_token']").attr("value"),
-		 	      simplified_type: this._options.uploadType,
-				  scoped: this._options.scoped,
-				  scope_type: this._options.scope_type,
-				  scope_id: this._options.scope_id,
-				  parent_id: this._options.parent_id
-		},
-		debug: true,
-		onComplete: function(id, fileName, responseJSON) { self.uploadComplete(id, fileName, responseJSON); },
-		onSubmit: function(id, fileName) { self.uploadSubmit(id, fileName); },
-		onProgress: function(id, fileName, loaded, total) { self.uploadProgress(id, fileName, Math.round(loaded/total*100)); }
+	var uploader = new qq.FineUploaderBasic({
+			button: document.getElementById(self._options.uploadButtonId),
+			multiple: true,
+			maxConnections: 3,
+			request: {
+					endpoint: $("#new_rich_file").attr("action"),
+					params: {
+							authenticity_token: $("input[name='authenticity_token']").val(),
+							simplified_type: this._options.uploadType,
+							scoped: this._options.scoped,
+							scope_type: this._options.scope_type,
+							scope_id: this._options.scope_id,
+							parent_id: this._options.parent_id
+					}
+			},
+			debug: true,
+			callbacks: {
+					onComplete: function(id, name, responseJSON) {
+							self.uploadComplete(id, name, responseJSON);
+					},
+					onSubmit: function(id, name) {
+							self.uploadSubmit(id, name);
+					},
+					onProgress: function(id, name, uploadedBytes, totalBytes) {
+							self.uploadProgress(id, name, Math.round(uploadedBytes / totalBytes * 100));
+					}
+			}
 	});
 };
 
